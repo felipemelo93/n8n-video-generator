@@ -1,0 +1,357 @@
+{
+  "name": "My workflow 8",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3d3149f2-cec9-40c6-9bf2-4d130028170a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4be41f75-02bd-4200-af19-acbf92406fa5",
+              "name": "prompt",
+              "value": "Technical expert working with AI data, institutional style, sober colors.",
+              "type": "string"
+            },
+            {
+              "id": "d495bcae-fdf7-40f4-99c9-4007743d1bdf",
+              "name": "image_url",
+              "value": "https://drive.google.com/uc?export=view&id=1AVhINhTFnEpaDIs_vbBZEN95pjg8rO_-",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ff688e22-0427-4304-93e1-b57d656f061f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/kling-video/v1.5/pro/image-to-video",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "key 49973c51-9ecb-4577-a7f2-0bc319895879:013fbd65bfb8ef4139fb9415bbb6b046"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.prompt }}"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ff1fc8be-6d44-491d-be28-49074d76460b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5e134f4e-51b1-4984-a62e-2d9a75b8e932",
+      "name": "Wait",
+      "webhookId": "1a07f134-e1ea-4ef8-b736-1f2aa12f012b"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.status_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authentication",
+              "value": "key 49973c51-9ecb-4577-a7f2-0bc319895879:013fbd65bfb8ef4139fb9415bbb6b046"
+            }
+          ]
+        },
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "fa5ff175-d78f-4614-8140-6927a325e978",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authentication",
+              "value": "key 49973c51-9ecb-4577-a7f2-0bc319895879:013fbd65bfb8ef4139fb9415bbb6b046"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1552,
+        -480
+      ],
+      "id": "2f831cb2-072f-4b7a-94ba-2b76cc8a4acf",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        -144
+      ],
+      "id": "130ec149-b882-4e13-b674-1199cbaf8feb",
+      "name": "Wait1",
+      "webhookId": "9b545532-6142-4cff-a65d-fa66eee785e7"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('HTTP Request1').item.json.response_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Athentication",
+              "value": "key 49973c51-9ecb-4577-a7f2-0bc319895879:013fbd65bfb8ef4139fb9415bbb6b046"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1696,
+        -128
+      ],
+      "id": "1c24bdcc-785f-4e87-9742-33028c61a681",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9b24fd56-2935-44e5-bcf6-7104b4edf2d9",
+              "leftValue": "={{ $('HTTP Request1').item.json.status }} Equal COMPLETED",
+              "rightValue": "={{ $('HTTP Request1').item.json.status }} Equal FAILED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1168,
+        -176
+      ],
+      "id": "8853493f-f3fd-40b1-9fef-61e8ffbe2a72",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Athentication",
+              "value": "key 49973c51-9ecb-4577-a7f2-0bc319895879:013fbd65bfb8ef4139fb9415bbb6b046"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1904,
+        -128
+      ],
+      "id": "2fdbc3bb-c5d8-4e8a-add5-74e561f67132",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        []
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "724054d5-90a9-4ac4-9090-9a287ceb48ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3f6dd5ff3ab778625149654fb7c51c97d08688fedd616681701c0e7e518189fa"
+  },
+  "id": "NHYQmZvsTJYjjUfm",
+  "tags": []
+}
